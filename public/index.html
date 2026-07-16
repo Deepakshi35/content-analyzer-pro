@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Analyzer Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Dark Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6); /* Slate 800 with opacity */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Shine Animation for the Button */
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shine::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+            transform: skewX(-20deg);
+            animation: shine 3s infinite;
+        }
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        /* Custom Scrollbar for Textarea */
+        textarea::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 8px; }
+        textarea::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 8px; }
+        textarea::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
+    </style>
+</head>
+<body class="bg-[#0f172a] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))] min-h-screen p-4 md:p-8 lg:p-12 text-slate-200 selection:bg-indigo-500/30">
+    
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-10 text-center animate-fade-in-down">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 mb-4 tracking-tight drop-shadow-lg">
+                Content Analyzer Pro
+            </h1>
+            <p class="text-base md:text-lg text-slate-400 font-medium">AI-powered discovery, tagging, and predictive engagement analysis.</p>
+        </header>
+
+        <main class="grid lg:grid-cols-2 gap-6 md:gap-8">
+            
+            <div class="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col transition-all duration-500 hover:shadow-indigo-500/10 hover:border-indigo-500/30 group">
+                <label class="block text-sm font-bold text-slate-300 mb-3 tracking-wide uppercase" for="contentInput">
+                    Draft Content
+                </label>
+                <textarea id="contentInput" rows="12" class="w-full p-5 bg-slate-900/60 border border-slate-700/60 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none shadow-inner text-slate-100 placeholder-slate-500 flex-grow text-base leading-relaxed" placeholder="Paste your article, social media post, or script here..."></textarea>
+                
+                <button id="analyzeBtn" class="btn-shine mt-6 w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-lg py-4 px-6 rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_35px_rgba(168,85,247,0.6)] hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-3">
+                    <svg id="spinner" class="animate-spin h-6 w-6 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span id="btnText">Analyze & Score</span>
+                </button>
+                <p id="errorMsg" class="text-pink-400 text-sm mt-4 hidden text-center font-semibold bg-pink-400/10 py-2 rounded-lg"></p>
+            </div>
+
+            <div id="resultsPanel" class="glass-panel rounded-3xl p-6 md:p-8 shadow-2xl hidden flex-col gap-8 transition-all duration-500">
+                
+                <div class="grid grid-cols-2 gap-4 md:gap-6">
+                    <div class="p-6 bg-slate-800/80 rounded-2xl shadow-lg border border-slate-700/50 flex flex-col justify-center items-center text-center transition duration-300 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-indigo-500/20 group">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 group-hover:text-indigo-400 transition-colors">Score</h3>
+                        <div class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-indigo-300 to-purple-400 flex items-baseline gap-1">
+                            <span id="engagementScore">0</span>
+                            <span class="text-xl text-slate-500 font-bold">/100</span>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 bg-slate-800/80 rounded-2xl shadow-lg border border-slate-700/50 flex flex-col justify-center items-center text-center transition duration-300 hover:-translate-y-1 hover:border-purple-500/50 hover:shadow-purple-500/20 group">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-3 group-hover:text-purple-400 transition-colors">Category</h3>
+                        <span id="categoryBadge" class="inline-block px-5 py-2 rounded-xl bg-purple-500/10 text-purple-300 border border-purple-500/20 font-bold text-sm tracking-wide shadow-inner">...</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                        Auto-Generated Tags
+                    </h3>
+                    <div id="tagsContainer" class="flex flex-wrap gap-2.5">
+                        </div>
+                </div>
+
+                <div class="flex-grow">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Actionable Tips
+                    </h3>
+                    <ul id="tipsList" class="space-y-4">
+                        </ul>
+                </div>
+            </div>
+
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
